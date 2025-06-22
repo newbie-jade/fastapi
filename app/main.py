@@ -56,9 +56,10 @@ def test_posts(db:Session = Depends(get_db)):
     return {"data": posts}
 
 @app.get("/posts")
-def get_posts():
-    cursor.execute("""select * from posts""")
-    posts = cursor.fetchall()
+def get_posts(db:Session = Depends(get_db)):
+    # cursor.execute("""select * from posts""")
+    # posts = cursor.fetchall()
+    posts = db.query(models.Post).all()
     print(posts)
     return {"data": posts}
 
