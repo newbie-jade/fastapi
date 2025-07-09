@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Response, status, HTTPException, Depends
 from fastapi.params import Body
 from pydantic import BaseModel
+from passlib.context import CryptContext
 from typing import Optional,List
 from random import randrange
 import psycopg2
@@ -11,6 +12,8 @@ import app.models as models
 import app.schemas as schemas
 from app.database import engine, get_db
 
+# telling passlib what hashing algorithm we want to use
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 models.Base.metadata.create_all(bind=engine)
 
 
@@ -136,8 +139,12 @@ def update_post(id: int, updated_post:schemas.PostsCreate, db:Session = Depends(
 
     return post_query.first()
 
-@app.post("/users", status_code=status.HTTP_201_CREATED)
+@app.post("/users", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
 def create_user(user:schemas.UserCreate, db:Session = Depends(get_db)):
+
+    #hash the password - user.password
+    hashed_password = pwd_context.hash(user.password)
+    user.password = hashed_password
     new_user = models.User(**user.model_dump())
     db.add(new_user)
     db.commit()
