@@ -12,7 +12,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl='login')
 
 SECRET_KEY = "6a7e5fbded91f0f1c4b0b6e0c0c279df3a8d8a6d87955ea3b8f79d47f5b7c1e3"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 def create_access_token(data: dict):
     to_encode = data.copy()
@@ -28,9 +28,7 @@ def verify_access_token(token:str, credentials_exception):
     print(token)
     
     try:
-        print(111111111111111111)
         payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
-        print(222222222222222)
         id:str = payload.get("user_id")
         print(id)
         if id is None:
